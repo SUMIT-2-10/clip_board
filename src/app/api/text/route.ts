@@ -6,8 +6,8 @@ export async function POST(req: Request) {
     await connectDB();
 
     try {
-        const { content } = await req.json();
-        const link = Math.floor(100000 + Math.random() * 900000); // Generate a random 6-digit link
+        const { content, link } = await req.json();
+        // Generate a random 6-digit link
         const newText = new Text({ content, link, expiresAt: new Date(Date.now() + 1000 * 60 * 60) , code: link}); // Set expiration to 1 hour
         await newText.save();
         return new Response(JSON.stringify({ link }), { status: 201 });
