@@ -1,25 +1,7 @@
 "use client";
 
-import React, { useState, useRef, DragEvent } from "react";
-
-// --- SVG Icons ---
-const TextIcon = ({ className = "w-5 h-5" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-  </svg>
-);
-
-const FileIcon = ({ className = "w-5 h-5" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
-  </svg>
-);
-
-const UploadIcon = ({ className = "w-8 h-8" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
-  </svg>
-);
+import Link from "next/link";
+import React, { useState } from "react";
 
 const CopyIcon = ({ className = "w-4 h-4" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
@@ -39,7 +21,8 @@ export default function ShareDashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [link, setLink] = useState<number | null>(null);
-
+  const [copied, setCopied] = useState(false);
+  const url = `${process.env.NEXT_PUBLIC_BASE_URL}/retrieve/${link}`;
 
   // Example recent items
 
@@ -47,6 +30,16 @@ export default function ShareDashboard() {
     setText("");
     setSuccess(false);
     setLink(null);
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    } catch (err) {
+      console.error("Failed to copy text", err);
+    }
   };
 
 
@@ -72,17 +65,13 @@ export default function ShareDashboard() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-background text-foreground font-sans selection:bg-primary/20">
-
+    <div className="h-full w-full bg-background text-foreground font-sans selection:bg-primary/20">
       {/* Main Dashboard */}
-      <main className="flex w-full justify-center items-center h-screen">
-
+      <main className="flex h-full w-full justify-center items-center ">
         {/* Primary Action Card (Spans 8 cols on tablet/desktop) */}
         <div className="w-full md:col-span-8 bg-card text-card-foreground rounded-3xl p-6 sm:p-8 shadow-sm border border-border overflow-hidden relative">
-
           {/* Dynamic Content Area */}
           <div className="relative z-10 min-h-[280px] flex flex-col">
-
             <form onSubmit={handleTextSubmit} className="flex flex-col flex-grow animate-in fade-in slide-in-from-bottom-2 duration-500">
               <div className="flex-grow relative group">
                 <textarea
@@ -128,7 +117,26 @@ export default function ShareDashboard() {
 
           </div>
           {success && (
-            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Code to Retreive {link}</p>
+            <div className="flex flex-col gap-2">
+              <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Code to Retreive {link}</p>
+              <div className="flex items-center gap-2">
+                <Link href={`/retrieve/${link}`}>
+                  {url}
+                </Link>
+                <button
+                  onClick={handleCopy}
+                  className="p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/80 transition"
+                  title={copied ? "Copied!" : "Copy to clipboard"}
+                  aria-label="Copy to clipboard"
+                  type="button"
+                >
+                  <CopyIcon className="w-4 h-4" />
+                </button>
+                {copied && (
+                  <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded shadow">Copied!</span>
+                )}
+              </div>
+            </div>
           )}
         </div>
       </main >
