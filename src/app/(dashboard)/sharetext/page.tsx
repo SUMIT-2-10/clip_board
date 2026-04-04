@@ -66,8 +66,10 @@ export default function ShareDashboard() {
 
   return (
     <div className="h-full w-full bg-background text-foreground font-sans selection:bg-primary/20">
+
       {/* Main Dashboard */}
-      <main className="flex h-full w-full justify-center items-center ">
+      <main className="flex flex-col h-full w-full justify-center items-center gap-6 p-6">
+      <h1 className="text-2xl font-bold">Text Upload</h1>
         {/* Primary Action Card (Spans 8 cols on tablet/desktop) */}
         <div className="w-full md:col-span-8 bg-card text-card-foreground rounded-3xl p-6 sm:p-8 shadow-sm border border-border overflow-hidden relative">
           {/* Dynamic Content Area */}

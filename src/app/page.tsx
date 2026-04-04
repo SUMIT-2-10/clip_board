@@ -1,11 +1,9 @@
 
 
-
-
 const home = () => {
   return (
     <main className="flex flex-col items-center justify-center h-full w-full bg-background text-foreground p-6 ">
-      <h1 className="text-4xl font-bold mb-4">Welcome h to ClipBoard!</h1>
+      <h1 className="text-4xl font-bold mb-4">Welcome to ClipBoard!</h1>
       <p className="text-lg max-w-2xl text-center mb-8">
         <span className="font-semibold">ClipBoard</span> is your modern solution for quickly sharing and retrieving text or files across devices. Whether you want to copy important notes, share code snippets, or transfer files securely, ClipBoard makes it effortless and fast.
       </p>

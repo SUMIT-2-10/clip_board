@@ -1,179 +1,228 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { upload } from "@/lib/imagekit";
+import { useRef, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import Link from "next/link";
+import { CopyIcon } from "lucide-react";
 
-export default function ShareDashboard() {
-  // File state
-  const [files, setFiles] = useState([]);
-  const [isUploading, setIsUploading] = useState(false);
-  const [statusMessage, setStatusMessage] = useState("");
-  const fileInputRef = useRef(null);
+export default function Home() {
+  const [copied, setCopied] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [code, setCode] = useState("");
+  const [url, setUrl] = useState("");
+  const [isDragActive, setIsDragActive] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Format file size
-  const formatFileSize = (bytes) => {
+  const formatFileSize = (bytes: number) => {
     if (!bytes) return "0 KB";
     const kb = bytes / 1024;
     if (kb < 1024) return `${kb.toFixed(1)} KB`;
     return `${(kb / 1024).toFixed(2)} MB`;
   };
 
-  // Create file item objects
-  const createFileItems = (rawFiles) =>
-    Array.from(rawFiles).map((file) => ({
-      file,
-      progress: 0,
-      status: "pending",
-      abortController: null,
-    }));
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0];
+    if (!selected) return;
 
-  // Handle file select
-  const onFileChange = (e) => {
-    const selected = createFileItems(e.target.files || []);
-    if (selected.length === 0) return;
-    setFiles((prev) => [...prev, ...selected]);
+    setFile(selected);
     e.target.value = "";
   };
 
-  // Handle drag & drop
-  const handleDrop = (e) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    const dropped = createFileItems(e.dataTransfer.files || []);
+    setIsDragActive(false);
+
+    const dropped = e.dataTransfer.files;
     if (dropped.length === 0) return;
-    setFiles((prev) => [...prev, ...dropped]);
+
+    setFile(dropped[0]);
   };
 
-  // Cancel file
-  const handleCancelFile = (index) => {
-    setFiles((prev) => {
-      const file = prev[index];
-      if (file.abortController) file.abortController.abort();
-      return prev.filter((_, i) => i !== index);
-    });
+  const handleCancelFile = () => {
+    setFile(null);
+    setUploadProgress(0);
   };
 
-  // Upload files
-  const handleUpload = async () => {
-    if (files.length === 0) {
-      setStatusMessage("Please select files");
-      return;
-    }
-    setIsUploading(true);
-    setStatusMessage("Uploading...");
+  const generateCode = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  };
+
+  const handleCopy = async () => {
     try {
-      for (let i = 0; i < files.length; i++) {
-        const controller = new AbortController();
-        setFiles((prev) =>
-          prev.map((f, index) =>
-            index === i ? { ...f, status: "uploading", abortController: controller } : f
-          )
-        );
-        await upload({
-          file: files[i].file,
-          fileName: `uploads/${Date.now()}-${files[i].file.name.replace(/\s+/g, "-")}`,
-          folder: "GalleryApp",
-          abortSignal: controller.signal,
-          onProgress: (event) => {
-            const percent = (event.loaded / event.total) * 100;
-            setFiles((prev) =>
-              prev.map((f, index) =>
-                index === i ? { ...f, progress: percent } : f
-              )
-            );
-          },
-        });
-        setFiles((prev) =>
-          prev.map((f, index) =>
-            index === i ? { ...f, status: "done", abortController: null } : f
-          )
-        );
-      }
-      setStatusMessage("All files uploaded successfully!");
-      setFiles([]);
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
     } catch (err) {
-      setStatusMessage("Upload stopped or failed");
-    } finally {
-      setIsUploading(false);
+      console.error("Failed to copy text", err);
     }
   };
 
-  const statusTone =
-    statusMessage.includes("uploaded")
-      ? "text-(--primary)"
-      : statusMessage.includes("Uploading")
-        ? "text-(--muted-foreground)"
-        : "text-(--destructive)";
+  const handleUpload = async () => {
+    if (!file) return alert("Select a file first");
+
+    let progressTimer: ReturnType<typeof setInterval> | null = null;
+
+    try {
+      setUploading(true);
+      setUploadProgress(5);
+
+      // Supabase storage upload doesn't expose native browser progress here,
+      // so we keep a smooth progress indicator until completion.
+      progressTimer = setInterval(() => {
+        setUploadProgress((prev) => (prev >= 95 ? prev : prev + 5));
+      }, 250);
+
+      const filePath = `files/${Date.now()}-${file.name}`;
+
+      // Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from("Clip_Board")
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data } = supabase.storage
+        .from("Clip_Board")
+        .getPublicUrl(filePath);
+
+      const fileUrl = data.publicUrl;
+
+      // Generate code
+      const generatedCode = generateCode();
+
+      // Format as PostgreSQL `time with time zone` (timetz): HH:MM:SS+00
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+      const hh = String(expiresAt.getUTCHours()).padStart(2, "0");
+      const mm = String(expiresAt.getUTCMinutes()).padStart(2, "0");
+      const ss = String(expiresAt.getUTCSeconds()).padStart(2, "0");
+      const expireAtTimetz = `${hh}:${mm}:${ss}+00`;
+
+      // Store in DB
+      const { error: dbError } = await supabase.from("Clip_Board").insert([
+        {
+          code: generatedCode,
+          file_url: fileUrl,
+          expire_at: expireAtTimetz, // 1 hour from now (UTC time)
+        },
+      ]);
+
+      if (dbError) throw dbError;
+
+      setUploadProgress(100);
+      setCode(generatedCode);
+      setUrl(fileUrl);
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message);
+    } finally {
+      if (progressTimer) clearInterval(progressTimer);
+      setUploading(false);
+    }
+  };
 
   return (
-    <section className="p-4 flex items-center justify-center h-full bg-(--background) text-(--foreground)">
-      <div className="mx-auto border rounded-3xl border-(--border) bg-(--card) text-(--card-foreground) w-full max-w-2xl p-4 max-h-[80vh] shadow-sm flex flex-col">
-        {/* DROPZONE */}
+    <main className="flex  flex-col w-full h-full items-center justify-center gap-6 p-6">
+      <h1 className="text-2xl font-bold">File Upload</h1>
+
+      <div className="mx-auto border rounded-3xl border-border bg-card text-card-foreground w-full max-w-2xl p-4 max-h-[80vh] shadow-sm flex flex-col">
         <div
-          onClick={() => fileInputRef.current && fileInputRef.current.click()}
-          onDragOver={(e) => e.preventDefault()}
+          onClick={() => fileInputRef.current?.click()}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragActive(true);
+          }}
+          onDragLeave={() => setIsDragActive(false)}
           onDrop={handleDrop}
-          className="border-2 border-dashed border-(--border) rounded-xl p-8 h-80 sm:h-96 md:h-[22rem] flex flex-col items-center justify-center text-center cursor-pointer hover:bg-(--accent) transition"
+          className={`border-2 border-dashed rounded-xl p-8 min-h-55 flex flex-col items-center justify-center text-center cursor-pointer transition ${
+            isDragActive
+              ? "border-primary bg-accent"
+              : "border-border hover:bg-accent"
+          }`}
         >
           <p className="text-lg font-medium">
-            Drag & drop files here or click to upload
+            Drag and drop a file here or click to upload
           </p>
-          <p className="text-sm text-(--muted-foreground)">Multiple files allowed</p>
+          <p className="text-sm text-muted-foreground">Single file upload</p>
+
           <input
             type="file"
-            multiple
             ref={fileInputRef}
             className="hidden"
             onChange={onFileChange}
           />
         </div>
-        {/* FILE LIST & UPLOAD BUTTON WRAPPER */}
-        <div className="flex flex-col grow overflow-hidden">
-          {files.length > 0 && (
-            <div className="grow overflow-y-auto space-y-3 pr-2 mt-4">
-              {files.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between border border-(--border) bg-(--background) p-3 rounded-lg"
-                >
-                  <div>
-                    <p className="text-sm font-medium">{item.file.name}</p>
-                    <p className="text-xs text-(--muted-foreground)">{formatFileSize(item.file.size)}</p>
+
+        {file && (
+          <div className="mt-4 space-y-3">
+            <div className="flex items-center justify-between border border-border bg-background p-3 rounded-lg">
+              <div className="w-full pr-4">
+                <p className="text-sm font-medium">{file.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {formatFileSize(file.size)}
+                </p>
+
+                <div className="mt-2">
+                  <div className="h-1.5 w-full rounded bg-secondary overflow-hidden">
+                    <div
+                      className="h-full bg-primary transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
                   </div>
-                  {item.status === "uploading" ? (
-                    <div className="w-32 h-2 bg-(--secondary) rounded">
-                      <div
-                        className="h-2 bg-(--primary) rounded"
-                        style={{ width: `${item.progress}%` }}
-                      />
-                    </div>
-                  ) : item.status === "done" ? (
-                    <span className="text-(--primary) text-sm">✓</span>
-                  ) : (
-                    <button
-                      onClick={() => handleCancelFile(index)}
-                      className="text-(--muted-foreground) hover:text-(--destructive)"
-                    >
-                      ✕
-                    </button>
-                  )}
+                  <p className="text-[11px] text-muted-foreground mt-1">
+                    {uploading
+                      ? `${uploadProgress}% uploaded`
+                      : uploadProgress === 100
+                        ? "100% uploaded"
+                        : "Ready to upload"}
+                  </p>
                 </div>
-              ))}
+              </div>
+
+              <button
+                onClick={handleCancelFile}
+                className="text-muted-foreground hover:text-destructive"
+                disabled={uploading}
+                type="button"
+              >
+                ✕
+              </button>
             </div>
-          )}
-          {files.length > 0 && (
+
             <button
               onClick={handleUpload}
-              disabled={isUploading}
-              className="mt-4 w-full bg-(--primary) text-(--primary-foreground) py-2 rounded-lg hover:opacity-90 transition disabled:opacity-50 flex shrink-0 items-center justify-center"
+              disabled={uploading}
+              className="w-full bg-primary text-primary-foreground py-2 rounded-lg hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center"
             >
-              {isUploading ? "Uploading..." : "Upload Files"}
+              {uploading ? "Uploading..." : "Upload File"}
             </button>
-          )}
-        </div>
-        {statusMessage && (
-          <p className={`mt-3 text-sm ${statusTone}`}>{statusMessage}</p>
+          </div>
+        )}
+
+        {code && (
+          <div className="flex p-2 justify-center items-center gap-2">
+            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+              Code to Retreive {code}
+            </p>
+            <button
+              onClick={handleCopy}
+              className=" p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/80 transition"
+              title={copied ? "Copied!" : "Copy to clipboard"}
+              aria-label="Copy to clipboard"
+              type="button"
+            >
+              <CopyIcon className="w-4 h-4" />
+            </button>
+            {copied && (
+              <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded shadow">
+                Copied!
+              </span>
+            )}
+          </div>
         )}
       </div>
-    </section>
+    </main>
   );
 }

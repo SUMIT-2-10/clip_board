@@ -47,7 +47,8 @@ const page = () => {
   return (
     <div className="h-full w-full bg-background text-foreground font-sans selection:bg-primary/20">
       {/* Main Dashboard */}
-      <main className="flex flex-col justify-center items-center h-full p-4">
+      <main className="flex flex-col justify-center items-center h-full gap-6 p-6">
+      <h1 className="text-2xl font-bold">Retrieve Text</h1>
         {/* Primary Action Card */}
         <div className="w-full max-w-xl bg-card text-card-foreground rounded-3xl p-6 sm:p-8 shadow-sm border border-border overflow-hidden relative">
           {/* Dynamic Content Area */}
