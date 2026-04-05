@@ -65,7 +65,7 @@ const page = () => {
                                     <span className="absolute top-2 right-12 bg-primary text-primary-foreground text-xs px-2 py-1 rounded shadow">Copied!</span>
                                 )}
                             </div>
-                            <p className="max-h-40 overflow-y-auto text-lg font-medium whitespace-pre-wrap break-words bg-muted/50 p-4 rounded-xl border border-border pr-12">
+                            <p className="max-h-40 overflow-y-auto text-lg font-medium whitespace-pre-wrap wrap-break-word bg-muted/50 p-4 rounded-xl border border-border pr-12">
                                 {text}
                             </p>
                         </div>

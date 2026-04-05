@@ -1,5 +1,6 @@
 "use client";
 
+import generateLink from "@/lib/id";
 import Link from "next/link";
 import React, { useState } from "react";
 
@@ -20,9 +21,9 @@ export default function ShareDashboard() {
   const [text, setText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [link, setLink] = useState<number | null>(null);
+  const [link, setLink] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const url = `${process.env.NEXT_PUBLIC_BASE_URL}/retrieve/${link}`;
+  const url = `${process.env.NEXT_PUBLIC_BASE_URL}/retrieve/text/${link}`;
 
   // Example recent items
 
@@ -46,7 +47,7 @@ export default function ShareDashboard() {
   const handleTextSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!text.trim()) return;
-    const link = Math.floor(100000 + Math.random() * 900000);
+    const link = generateLink();
     setLink(link);
     setIsSubmitting(true);
     try {
@@ -73,14 +74,14 @@ export default function ShareDashboard() {
         {/* Primary Action Card (Spans 8 cols on tablet/desktop) */}
         <div className="w-full md:col-span-8 bg-card text-card-foreground rounded-3xl p-6 sm:p-8 shadow-sm border border-border overflow-hidden relative">
           {/* Dynamic Content Area */}
-          <div className="relative z-10 min-h-[280px] flex flex-col">
-            <form onSubmit={handleTextSubmit} className="flex flex-col flex-grow animate-in fade-in slide-in-from-bottom-2 duration-500">
-              <div className="flex-grow relative group">
+          <div className="relative z-10 min-h-70 flex flex-col">
+            <form onSubmit={handleTextSubmit} className="flex flex-col grow animate-in fade-in slide-in-from-bottom-2 duration-500">
+              <div className="grow relative group">
                 <textarea
                   value={text}
                   onChange={(e) => setText(e.target.value)}
                   placeholder="Paste or type your text here..."
-                  className="w-full h-full min-h-[200px] resize-none bg-transparent text-lg text-foreground placeholder:text-muted-foreground focus:outline-none p-2 leading-relaxed"
+                  className="w-full h-full min-h-50 resize-none bg-transparent text-lg text-foreground placeholder:text-muted-foreground focus:outline-none p-2 leading-relaxed"
                 />
 
                 {/* Character Count */}
@@ -122,7 +123,7 @@ export default function ShareDashboard() {
             <div className="flex flex-col gap-2">
               <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Code to Retreive {link}</p>
               <div className="flex items-center gap-2">
-                <Link href={`/retrieve/${link}`}>
+                <Link href={`/retrieve/text/${link}`}>
                   {url}
                 </Link>
                 <button

@@ -122,7 +122,7 @@ const page = () => {
                   Copied!
                 </span>
               )}
-              <p className="text-lg font-medium whitespace-pre-wrap break-words bg-muted/50 p-4 rounded-xl border border-border">
+              <p className="text-lg font-medium whitespace-pre-wrap wrap-break-word bg-muted/50 p-4 rounded-xl border border-border">
                 {text}
               </p>
             </div>

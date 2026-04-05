@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { CopyIcon } from "lucide-react";
+import generateLink from "@/lib/id";
 
 export default function Home() {
   const [copied, setCopied] = useState(false);
@@ -11,7 +12,6 @@ export default function Home() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [code, setCode] = useState("");
-  const [url, setUrl] = useState("");
   const [isDragActive, setIsDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -43,10 +43,6 @@ export default function Home() {
   const handleCancelFile = () => {
     setFile(null);
     setUploadProgress(0);
-  };
-
-  const generateCode = () => {
-    return Math.floor(100000 + Math.random() * 900000).toString();
   };
 
   const handleCopy = async () => {
@@ -91,7 +87,7 @@ export default function Home() {
       const fileUrl = data.publicUrl;
 
       // Generate code
-      const generatedCode = generateCode();
+      const generatedCode = generateLink();
 
       // Format as PostgreSQL `time with time zone` (timetz): HH:MM:SS+00
       const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
@@ -113,7 +109,6 @@ export default function Home() {
 
       setUploadProgress(100);
       setCode(generatedCode);
-      setUrl(fileUrl);
     } catch (err: any) {
       console.error(err);
       alert(err.message);
