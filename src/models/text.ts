@@ -7,7 +7,7 @@ const textSchema = new Schema({
     },
 
     link: {
-        type: Number, // or String if you want links as strings
+        type: String,
         required: true,
         unique: true,   // 🔥 important
         index: true
@@ -18,7 +18,7 @@ const textSchema = new Schema({
         default: () => Date.now() + 1000 * 60 * 60 * 24 // 24 hrs
     },
     code: {
-        type: Number,
+        type: String,
         required: true,
         unique: true
     }

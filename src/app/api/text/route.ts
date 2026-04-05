@@ -7,10 +7,21 @@ export async function POST(req: Request) {
 
     try {
         const { content, link } = await req.json();
-        // Generate a random 6-digit link
-        const newText = new Text({ content, link, expiresAt: new Date(Date.now() + 1000 * 60 * 60) , code: link}); // Set expiration to 1 hour
+        const normalizedLink = String(link).trim();
+
+        if (!content || !normalizedLink) {
+            return new Response(JSON.stringify({ error: 'Content and link are required' }), { status: 400 });
+        }
+
+        // Save alphanumeric code/link and expire it after 1 hour
+        const newText = new Text({
+            content,
+            link: normalizedLink,
+            expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+            code: normalizedLink,
+        });
         await newText.save();
-        return new Response(JSON.stringify({ link }), { status: 201 });
+        return new Response(JSON.stringify({ link: normalizedLink }), { status: 201 });
     } catch (error) {
         console.error('Error saving text:', error);
         return new Response(JSON.stringify({ error: 'Failed to save text' }), { status: 500 });
@@ -20,12 +31,12 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
     await connectDB();
     const urlObj = new URL(req.url);
-    const code = urlObj.searchParams.get('code');
+    const code = urlObj.searchParams.get('code')?.trim();
     if (!code) {
         return new Response(JSON.stringify({ error: 'Code parameter is required' }), { status: 400 });
     }
     try {
-        const textData = await Text.findOne({ code: Number(code) });
+        const textData = await Text.findOne({ code });
         if (!textData) {
             return new Response(JSON.stringify({ error: 'Text not found' }), { status: 404 });
         }
