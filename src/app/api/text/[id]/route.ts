@@ -16,7 +16,7 @@ export async function GET(req: Request) {
     try {
         let textData = null;
         if (code) {
-            textData = await Text.findOne({ code: Number(code) });
+            textData = await Text.findOne({ code: code.trim() });
         } else if (link) {
             textData = await Text.findOne({ link });
         }
