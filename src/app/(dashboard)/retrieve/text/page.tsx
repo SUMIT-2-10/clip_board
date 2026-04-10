@@ -12,6 +12,7 @@ const page = () => {
   const [isRetreiving, setIsRetreiving] = useState(false);
   const [otp, setOtp] = useState("");
   const [text, setText] = useState("");
+  const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -29,16 +30,31 @@ const page = () => {
     e.preventDefault();
     if (!otp || otp.length !== 6) return;
     setIsRetreiving(true);
+    setError("");
+    setText("");
+
     try {
       const res = await fetch(`/api/text?code=${otp}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
+
       const data = await res.json();
-      console.log(data);
+
+      if (!res.ok) {
+        setError(data?.error || "Failed to retrieve text");
+        return;
+      }
+
+      if (!data?.content) {
+        setError("Text not found");
+        return;
+      }
+
       setText(data.content);
     } catch (err) {
       console.error(err);
+      setError("Something went wrong while retrieving text");
     } finally {
       setIsRetreiving(false);
     }
@@ -100,6 +116,12 @@ const page = () => {
             </form>
           </div>
         </div>
+
+        {error && (
+          <div className="w-full max-w-xl rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {error}
+          </div>
+        )}
 
         {text && (
           <div className="w-full max-w-xl bg-card text-card-foreground rounded-3xl p-6 sm:p-8 shadow-sm border border-border overflow-hidden relative mt-6 animate-in fade-in slide-in-from-bottom-2 duration-500">

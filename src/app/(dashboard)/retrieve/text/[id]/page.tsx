@@ -7,6 +7,7 @@ const page = () => {
     const { id } = useParams();
     const [text, setText] = useState("");
     const [isRetreiving, setIsRetreiving] = useState(false);
+    const [error, setError] = useState("");
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async () => {
@@ -22,16 +23,30 @@ const page = () => {
 
     const handleRetrieve = async () => {
         setIsRetreiving(true);
+        setError("");
+        setText("");
+
         try {
             const res = await fetch(`/api/text?code=${id}`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },
             });
             const data = await res.json();
-            console.log(data);
+
+            if (!res.ok) {
+                setError(data?.error || "Failed to retrieve text");
+                return;
+            }
+
+            if (!data?.content) {
+                setError("Text not found");
+                return;
+            }
+
             setText(data.content);
         } catch (err) {
             console.error(err);
+            setError("Something went wrong while retrieving text");
         } finally {
             setIsRetreiving(false);
         }
@@ -42,10 +57,20 @@ const page = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/20">
+        <div className="h-full bg-background text-foreground font-sans selection:bg-primary/20">
 
             {/* Main Dashboard */}
-            <main className="flex flex-col justify-center items-center min-h-screen p-4">
+            <main className="flex flex-col justify-center items-center h-full p-4">
+
+                {isRetreiving && (
+                    <p className="text-sm text-muted-foreground">Retrieving text...</p>
+                )}
+
+                {error && (
+                    <div className="w-full max-w-xl rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive mt-6">
+                        {error}
+                    </div>
+                )}
 
                 {text && (
                     <div className="w-full max-w-xl bg-card text-card-foreground rounded-3xl p-6 sm:p-8 shadow-sm border border-border overflow-hidden relative mt-6 animate-in fade-in slide-in-from-bottom-2 duration-500">

@@ -26,14 +26,17 @@ export default function Home() {
       setError("");
       setFileUrl(null);
 
-      // Fetch file from DB using code
-      const nowIso = new Date().toISOString();
+      // Match DB `time with time zone` (timetz): HH:MM:SS+00
+      const now = new Date();
+      const nowTimetz = `${String(now.getUTCHours()).padStart(2, "0")}:${String(
+        now.getUTCMinutes()
+      ).padStart(2, "0")}:${String(now.getUTCSeconds()).padStart(2, "0")}+00`;
 
       const { data, error } = await supabase
         .from("Clip_Board")
-        .select("file_url, expires_at")
+        .select("file_url, expire_at")
         .eq("code", otp)
-        .gt("expires_at", nowIso) // only not-expired rows
+        .gt("expire_at", nowTimetz) // only not-expired rows
         .single();
 
       if (error) throw error;
@@ -42,11 +45,6 @@ export default function Home() {
         setError("Invalid OTP");
         return;
       }
-      if (data.expires_at && new Date(data.expires_at) < new Date()) {
-        setError("This link has expired");
-        return;
-      }
-
       setFileUrl(data.file_url);
       console.log("File URL:", data.file_url);
     } catch (err: any) {
@@ -79,7 +77,7 @@ export default function Home() {
       const a = document.createElement("a");
 
       a.href = url;
-      a.download = "downloaded-file";
+      a.download = decodeURIComponent(fileUrl.split("/").pop() || "downloaded-file");
       document.body.appendChild(a);
       a.click();
 

@@ -27,6 +27,10 @@ const textSchema = new Schema({
     timestamps: true // auto createdAt & updatedAt
 });
 
-const Text = mongoose.models.Text || mongoose.model('Text', textSchema);
+if (mongoose.models.Text) {
+    delete mongoose.models.Text;
+}
+
+const Text = mongoose.model('Text', textSchema);
 
 export default Text;

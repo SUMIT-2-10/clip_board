@@ -29,21 +29,28 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-    await connectDB();
-    const urlObj = new URL(req.url);
-    const code = urlObj.searchParams.get('code')?.trim();
-    if (!code) {
-        return new Response(JSON.stringify({ error: 'Code parameter is required' }), { status: 400 });
-    }
     try {
-        const textData = await Text.findOne({ code });
+        await connectDB();
+
+        const urlObj = new URL(req.url);
+        const code = urlObj.searchParams.get('code')?.trim();
+
+        if (!code) {
+            return new Response(JSON.stringify({ error: 'Code parameter is required' }), { status: 400 });
+        }
+
+        const textData = await Text.findOne({ code }).lean();
         if (!textData) {
             return new Response(JSON.stringify({ error: 'Text not found' }), { status: 404 });
+        }
+        if (textData.expiresAt && new Date(textData.expiresAt) < new Date()) {
+            return new Response(JSON.stringify({ error: 'This link has expired' }), { status: 410 });
         }
         return new Response(JSON.stringify({ content: textData.content, link: textData.link, code: textData.code }), { status: 200 });
     } catch (error) {
         console.error('Error retrieving text by code:', error);
-        return new Response(JSON.stringify({ error: 'Failed to retrieve text' }), { status: 500 });
+        const message = error instanceof Error ? error.message : 'Failed to retrieve text';
+        return new Response(JSON.stringify({ error: message }), { status: 500 });
     }
 }
 
