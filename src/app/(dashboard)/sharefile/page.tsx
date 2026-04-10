@@ -90,7 +90,7 @@ export default function Home() {
       const generatedCode = generateLink();
 
       // Format as PostgreSQL `time with time zone` (timetz): HH:MM:SS+00
-      const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+      const expiresAt = new Date(Date.now() + 60 * 1000);
       const hh = String(expiresAt.getUTCHours()).padStart(2, "0");
       const mm = String(expiresAt.getUTCMinutes()).padStart(2, "0");
       const ss = String(expiresAt.getUTCSeconds()).padStart(2, "0");
@@ -140,7 +140,7 @@ export default function Home() {
           <p className="text-lg font-medium">
             Drag and drop a file here or click to upload
           </p>
-          <p className="text-sm text-muted-foreground">Single file upload</p>
+          <p className="text-sm text-muted-foreground">Select a file to upload up to 50MB</p>
 
           <input
             type="file"
