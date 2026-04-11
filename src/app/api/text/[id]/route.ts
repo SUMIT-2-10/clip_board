@@ -1,5 +1,6 @@
 import Text from "@/models/text";
 import connectDB from "@/lib/dbConnect";
+import { isExpired } from "@/lib/time";
 
 // The GET function is intended to retrieve text data based on a unique link. However, the implementation is currently incomplete.
 
@@ -22,6 +23,9 @@ export async function GET(req: Request) {
         }
         if (!textData) {
             return new Response(JSON.stringify({ error: 'Text not found' }), { status: 404 });
+        }
+        if (isExpired(textData.expiresAt)) {
+            return new Response(JSON.stringify({ error: 'This link has expired' }), { status: 410 });
         }
         return new Response(JSON.stringify({ content: textData.content, link: textData.link, code: textData.code }), { status: 200 });
     } catch (error) {

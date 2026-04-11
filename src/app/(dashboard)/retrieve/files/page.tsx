@@ -9,6 +9,7 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { CopyIcon } from "lucide-react";
+import { nowIstIso } from "@/lib/time";
 
 export default function Home() {
   const [isRetrieving, setIsRetrieving] = useState(false);
@@ -26,17 +27,13 @@ export default function Home() {
       setError("");
       setFileUrl(null);
 
-      // Match DB `time with time zone` (timetz): HH:MM:SS+00
-      const now = new Date();
-      const nowTimetz = `${String(now.getUTCHours()).padStart(2, "0")}:${String(
-        now.getUTCMinutes()
-      ).padStart(2, "0")}:${String(now.getUTCSeconds()).padStart(2, "0")}+00`;
+      const nowIso = nowIstIso();
 
       const { data, error } = await supabase
         .from("Clip_Board")
         .select("file_url, expire_at")
         .eq("code", otp)
-        .gt("expire_at", nowTimetz) // only not-expired rows
+        .gt("expire_at", nowIso)
         .single();
 
       if (error) throw error;
@@ -47,9 +44,10 @@ export default function Home() {
       }
       setFileUrl(data.file_url);
       console.log("File URL:", data.file_url);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message || "Something went wrong");
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      setError(message);
     } finally {
       setIsRetrieving(false);
     }

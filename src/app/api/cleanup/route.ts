@@ -1,9 +1,10 @@
 import connectDB from "@/lib/dbConnect";
 import { supabase } from "@/lib/supabase";
 import Text from "@/models/text";
+import { nowIstIso } from "@/lib/time";
 
-export async function GET(req: Request) {
-  const auth = req.headers.get("authorization");
+export async function GET() {
+  // const auth = req.headers.get("authorization");
 
   // if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
   //   return new Response("Unauthorized", { status: 401 });
@@ -12,14 +13,12 @@ export async function GET(req: Request) {
 
   try {
     const now = new Date();
-    const nowTimetz = `${String(now.getUTCHours()).padStart(2, "0")}:${String(
-      now.getUTCMinutes()
-    ).padStart(2, "0")}:${String(now.getUTCSeconds()).padStart(2, "0")}+00`;
+    const nowIso = nowIstIso();
 
     const { data: expiredFiles, error: filesError } = await supabase
       .from("Clip_Board")
       .select("file_url, code, expire_at")
-      .lt("expire_at", nowTimetz);
+      .lt("expire_at", nowIso);
 
     if (filesError) {
       throw filesError;
@@ -70,7 +69,7 @@ export async function GET(req: Request) {
 
     const textDeleteResult = await Text.deleteMany({ expiresAt: { $lt: now } });
     const deletedTextsCount = textDeleteResult.deletedCount ?? 0;
-    console.log("CRON HIT AT:", new Date().toISOString());
+
     return new Response(
       JSON.stringify({
         now: now.toISOString(),

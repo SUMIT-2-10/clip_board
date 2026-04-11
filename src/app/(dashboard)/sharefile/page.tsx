@@ -2,9 +2,9 @@
 
 import { useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import Link from "next/link";
 import { CopyIcon } from "lucide-react";
 import generateLink from "@/lib/id";
+import { expiresInMinutesIstIso } from "@/lib/time";
 
 export default function Home() {
   const [copied, setCopied] = useState(false);
@@ -89,19 +89,14 @@ export default function Home() {
       // Generate code
       const generatedCode = generateLink();
 
-      // Format as PostgreSQL `time with time zone` (timetz): HH:MM:SS+00
-      const expiresAt = new Date(Date.now() + 60 * 1000);
-      const hh = String(expiresAt.getUTCHours()).padStart(2, "0");
-      const mm = String(expiresAt.getUTCMinutes()).padStart(2, "0");
-      const ss = String(expiresAt.getUTCSeconds()).padStart(2, "0");
-      const expireAtTimetz = `${hh}:${mm}:${ss}+00`;
+      const expiresAtIso = expiresInMinutesIstIso(10);
 
       // Store in DB
       const { error: dbError } = await supabase.from("Clip_Board").insert([
         {
           code: generatedCode,
           file_url: fileUrl,
-          expire_at: expireAtTimetz, // 1 hour from now (UTC time)
+          expire_at: expiresAtIso,
         },
       ]);
 
@@ -109,9 +104,10 @@ export default function Home() {
 
       setUploadProgress(100);
       setCode(generatedCode);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      alert(err.message);
+      const message = err instanceof Error ? err.message : "Upload failed";
+      alert(message);
     } finally {
       if (progressTimer) clearInterval(progressTimer);
       setUploading(false);

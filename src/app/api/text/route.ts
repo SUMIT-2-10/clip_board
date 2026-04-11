@@ -1,6 +1,7 @@
 
 import Text from "@/models/text";
 import connectDB from "@/lib/dbConnect";
+import { expiresInMinutesIstIso, isExpired } from "@/lib/time";
 
 export async function POST(req: Request) {
     await connectDB();
@@ -13,11 +14,13 @@ export async function POST(req: Request) {
             return new Response(JSON.stringify({ error: 'Content and link are required' }), { status: 400 });
         }
 
-        // Save alphanumeric code/link and expire it after 1 hour
+        // Save alphanumeric code/link and expire it after 10 minutes (testing)
+        const expiresAtIso = expiresInMinutesIstIso(10);
+
         const newText = new Text({
             content,
             link: normalizedLink,
-            expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+            expiresAt: expiresAtIso,
             code: normalizedLink,
         });
         await newText.save();
@@ -43,7 +46,7 @@ export async function GET(req: Request) {
         if (!textData) {
             return new Response(JSON.stringify({ error: 'Text not found' }), { status: 404 });
         }
-        if (textData.expiresAt && new Date(textData.expiresAt) < new Date()) {
+        if (isExpired(textData.expiresAt)) {
             return new Response(JSON.stringify({ error: 'This link has expired' }), { status: 410 });
         }
         return new Response(JSON.stringify({ content: textData.content, link: textData.link, code: textData.code }), { status: 200 });
