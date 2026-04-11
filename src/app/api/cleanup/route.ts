@@ -5,9 +5,9 @@ import Text from "@/models/text";
 export async function GET(req: Request) {
   const auth = req.headers.get("authorization");
 
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+  // if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
+  //   return new Response("Unauthorized", { status: 401 });
+  // }
   await connectDB();
 
   try {
@@ -70,7 +70,7 @@ export async function GET(req: Request) {
 
     const textDeleteResult = await Text.deleteMany({ expiresAt: { $lt: now } });
     const deletedTextsCount = textDeleteResult.deletedCount ?? 0;
-
+    console.log("CRON HIT AT:", new Date().toISOString());
     return new Response(
       JSON.stringify({
         now: now.toISOString(),
@@ -84,6 +84,7 @@ export async function GET(req: Request) {
         headers: { "Content-Type": "application/json" },
       }
     );
+
   } catch (error) {
     console.error("Error cleaning up expired files:", error);
     return new Response("Internal Server Error", { status: 500 });
