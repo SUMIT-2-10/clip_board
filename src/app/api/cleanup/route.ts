@@ -26,14 +26,30 @@ export async function GET() {
 
     const rows = expiredFiles ?? [];
     const filePaths = rows
-      .map((row) => {
+           .map((row) => {
         if (!row.file_url) return null;
-        const marker = "/Clip_Board/";
-        const idx = row.file_url.indexOf(marker);
-        if (idx === -1) return null;
-        return row.file_url.slice(idx + marker.length).split("?")[0];
+
+        try {
+          const url = new URL(row.file_url);
+          const parts = url.pathname.split("/");
+
+          // find bucket name
+          const bucketIndex = parts.findIndex(
+            (p) => p === "Clip_Board"
+          );
+
+          if (bucketIndex === -1) return null;
+
+          // return only path inside bucket
+          return parts.slice(bucketIndex + 1).join("/");
+        } catch {
+          return null;
+        }
       })
-      .filter((path): path is string => Boolean(path));
+      .filter((p): p is string => Boolean(p));
+
+    console.log("Deleting file paths:", filePaths);
+
 
     let storageDeletedCount = 0;
     if (filePaths.length > 0) {
