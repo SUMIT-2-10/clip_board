@@ -17,14 +17,13 @@ function formatWithOffset(date: Date, offsetMinutes: number): string {
   const hh = pad2(shifted.getUTCHours());
   const mm = pad2(shifted.getUTCMinutes());
   const ss = pad2(shifted.getUTCSeconds());
-  const ms = pad3(shifted.getUTCMilliseconds());
 
   const sign = offsetMinutes >= 0 ? "+" : "-";
   const abs = Math.abs(offsetMinutes);
   const offH = pad2(Math.floor(abs / 60));
   const offM = pad2(abs % 60);
 
-  return `${y}-${m}-${d}T${hh}:${mm}:${ss}.${ms}${sign}${offH}:${offM}`;
+  return `${y}-${m}-${d}T${hh}:${mm}:${ss}${sign}${offH}:${offM}`;
 }
 
 export function nowIstIso(): string {
