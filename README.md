@@ -34,3 +34,20 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Cron Auth For Cleanup
+
+The scheduled cleanup endpoint is [src/app/api/cleanup/route.ts](src/app/api/cleanup/route.ts).
+
+To secure it on Vercel:
+
+1. Add `CRON_SECRET` in Vercel Project Settings -> Environment Variables.
+2. Keep your schedule in [vercel.json](vercel.json) under `crons`.
+3. Vercel Cron automatically sends `Authorization: Bearer <CRON_SECRET>`.
+
+No manual password entry is needed per request. Vercel sends the header for cron invocations.
+
+Required environment variables:
+
+- Client-side uploads/retrieval: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`
+- Server cleanup route: `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `CRON_SECRET`

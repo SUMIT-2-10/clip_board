@@ -1,21 +1,26 @@
 import connectDB from "@/lib/dbConnect";
-import { supabase } from "@/lib/supabase";
+import { supabaseServer } from "@/lib/supabase-server";
 import Text from "@/models/text";
 import { nowIstIso } from "@/lib/time";
 
-export async function GET() {
-  // const auth = req.headers.get("authorization");
+export async function GET(req: Request) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) {
+    return new Response("CRON_SECRET is not configured", { status: 500 });
+  }
 
-  // if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
-  //   return new Response("Unauthorized", { status: 401 });
-  // }
+  const auth = req.headers.get("authorization");
+  if (auth !== `Bearer ${cronSecret}`) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
   await connectDB();
 
   try {
     const now = new Date();
     const nowIso = nowIstIso();
 
-    const { data: expiredFiles, error: filesError } = await supabase
+    const { data: expiredFiles, error: filesError } = await supabaseServer
       .from("Clip_Board")
       .select("file_url, code, expire_at")
       .lt("expire_at", nowIso);
@@ -53,7 +58,7 @@ export async function GET() {
 
     let storageDeletedCount = 0;
     if (filePaths.length > 0) {
-      const { error: storageError } = await supabase.storage
+      const { error: storageError } = await supabaseServer.storage
         .from("Clip_Board")
         .remove(filePaths);
 
@@ -64,17 +69,17 @@ export async function GET() {
       storageDeletedCount = filePaths.length;
     }
 
-    const expiredUrls = rows
-      .map((row) => row.file_url)
-      .filter((url): url is string => Boolean(url));
+    const expiredCodes = rows
+      .map((row) => row.code)
+      .filter((code): code is string => Boolean(code));
 
     let deletedClipRowsCount = 0;
-    if (expiredUrls.length > 0) {
-      const { data: deletedRows, error: deleteRowsError } = await supabase
+    if (expiredCodes.length > 0) {
+      const { data: deletedRows, error: deleteRowsError } = await supabaseServer
         .from("Clip_Board")
         .delete()
-        .in("file_url", expiredUrls)
-        .select("file_url");
+        .in("code", expiredCodes)
+        .select("code");
 
       if (deleteRowsError) {
         throw deleteRowsError;
