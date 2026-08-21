@@ -42,7 +42,7 @@ export default function ShareDashboard() {
   const [text, setText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [link, setLink] = useState<string | null>(null);
+  const [link, setLink] = useState<string >("");
   const [copied, setCopied] = useState(false);
   const url = `${process.env.NEXT_PUBLIC_BASE_URL}/retrieve/text/${link}`;
 
@@ -51,7 +51,7 @@ export default function ShareDashboard() {
   const handleClear = () => {
     setText("");
     setSuccess(false);
-    setLink(null);
+    setLink("");
   };
 
   const handleCopy = async () => {
