@@ -8,7 +8,7 @@ const Home = () => {
           <ClipboardIcon className="h-8 w-8" aria-hidden="true" />
         </div>
         <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-          ClipBoard
+          DropBoard
         </p>
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
           Share what matters, instantly.

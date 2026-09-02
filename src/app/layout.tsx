@@ -18,36 +18,36 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
   ),
   title: {
-    default: "ClipPort",
-    template: "%s | ClipBoard",
+    default: "DropBoard",
+    template: "%s | DropBoard",
   },
   description:
-    "ClipBoard is a fast, simple way to share text and files between devices using a temporary six-digit retrieval code.",
-  applicationName: "ClipBoard",
+    "DropBoard is a fast, simple way to share text and files between devices using a temporary six-digit retrieval code.",
+  applicationName: "DropBoard",
   keywords: [
-    "ClipBoard",
+    "DropBoard",
     "share text online",
     "share files online",
     "transfer files between devices",
     "temporary file sharing",
   ],
-  authors: [{ name: "ClipBoard" }],
-  creator: "ClipBoard",
-  publisher: "ClipBoard",
+  authors: [{ name: "DropBoard" }],
+  creator: "DropBoard",
+  publisher: "DropBoard",
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
-    siteName: "ClipBoard",
-    title: "ClipBoard | Share Text and Files Instantly",
+    siteName: "DropBoard",
+    title: "DropBoard | Share Text and Files Instantly",
     description:
       "Share text and files between devices with one simple, temporary retrieval code.",
     url: "/",
   },
   twitter: {
     card: "summary",
-    title: "ClipBoard | Share Text and Files Instantly",
+    title: "DropBoard | Share Text and Files Instantly",
     description:
       "Share text and files between devices with one simple, temporary retrieval code.",
   },
