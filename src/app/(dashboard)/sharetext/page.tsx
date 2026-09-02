@@ -86,12 +86,12 @@ export default function ShareDashboard() {
   };
 
   return (
-    <div className="h-full w-full bg-background text-foreground font-sans selection:bg-primary/20">
+    <div className="min-h-full w-full bg-background text-foreground font-sans selection:bg-primary/20">
       {/* Main Dashboard */}
-      <main className="flex flex-col h-full w-full justify-center items-center gap-6 p-6">
+      <main className="flex min-h-full w-full flex-col items-center justify-start gap-5 p-4 py-8 sm:justify-center sm:gap-6 sm:p-6">
         <h1 className="text-2xl font-bold">Text Upload</h1>
         {/* Primary Action Card (Spans 8 cols on tablet/desktop) */}
-        <div className="w-full md:col-span-8 bg-card text-card-foreground rounded-3xl p-6 sm:p-8 shadow-sm border border-border overflow-hidden relative">
+        <div className="w-full max-w-3xl bg-card text-card-foreground rounded-3xl p-4 sm:p-8 shadow-sm border border-border overflow-hidden relative">
           {/* Dynamic Content Area */}
           <div className="relative z-10 min-h-70 flex flex-col">
             <form
@@ -116,11 +116,11 @@ export default function ShareDashboard() {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-4 mt-4 pt-4 border-t border-border">
+              <div className="flex flex-col-reverse gap-3 mt-4 pt-4 pb-4 border-t border-border sm:flex-row sm:justify-end sm:gap-4">
                 <button
                   type="submit"
                   disabled={!text.trim() || isSubmitting}
-                  className="flex items-center gap-2 px-8 py-3 bg-primary text-primary-foreground rounded-xl font-medium shadow-sm hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex w-full items-center justify-center gap-2 px-8 py-3 bg-primary text-primary-foreground rounded-xl font-medium shadow-sm hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto"
                 >
                   {isSubmitting ? "Sending..." : "Send Text"}
                   {!isSubmitting && (
@@ -142,7 +142,7 @@ export default function ShareDashboard() {
                 <button
                   type="button"
                   onClick={handleClear}
-                  className="flex items-center gap-2 px-8 py-3 bg-primary text-primary-foreground rounded-xl font-medium shadow-sm hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex w-full items-center justify-center gap-2 px-8 py-3 bg-primary text-primary-foreground rounded-xl font-medium shadow-sm hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto"
                 >
                   Clear
                 </button>
@@ -150,9 +150,9 @@ export default function ShareDashboard() {
             </form>
           </div>
           {success && (
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <p className="text-sm font-medium text-muted-foreground tracking-wider">
+            <div className="flex flex-col  gap-2">
+              <div className="flex flex-wrap justify-center-safe items-center gap-2 ">
+                <p className="min-w-0 break-all text-sm font-medium uppercase text-muted-foreground tracking-wider">
                   Code to Retrieve {link}
                 </p>
                 <button

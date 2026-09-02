@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/input-otp";
 import { CopyIcon } from "lucide-react";
 
-const page = () => {
+const RetrieveTextPage = () => {
   const [isRetreiving, setIsRetreiving] = useState(false);
   const [otp, setOtp] = useState("");
   const [text, setText] = useState("");
@@ -61,12 +61,12 @@ const page = () => {
   };
 
   return (
-    <div className="h-full w-full bg-background text-foreground font-sans selection:bg-primary/20">
+    <div className="min-h-full w-full bg-background text-foreground font-sans selection:bg-primary/20">
       {/* Main Dashboard */}
-      <main className="flex flex-col justify-center items-center h-full gap-6 p-6">
+      <main className="flex min-h-full flex-col justify-start items-center gap-5 p-4 py-8 sm:justify-center sm:gap-6 sm:p-6">
       <h1 className="text-2xl font-bold">Retrieve Text</h1>
         {/* Primary Action Card */}
-        <div className="w-full max-w-xl bg-card text-card-foreground rounded-3xl p-6 sm:p-8 shadow-sm border border-border overflow-hidden relative">
+        <div className="w-full max-w-xl bg-card text-card-foreground rounded-3xl p-4 sm:p-8 shadow-sm border border-border overflow-hidden relative">
           {/* Dynamic Content Area */}
           <div className="relative z-10 flex flex-col">
             <form
@@ -92,7 +92,7 @@ const page = () => {
               <div className="flex justify-center mt-4 pt-4 border-t border-border">
                 <button
                   type="submit"
-                  disabled={!otp || otp.length !== 6}
+                  disabled={!otp || otp.length !== 6 || isRetreiving}
                   className="flex items-center gap-2 px-8 py-3 bg-primary text-primary-foreground rounded-xl font-medium shadow-sm hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isRetreiving ? "Retreiving..." : "Retreive"}
@@ -132,7 +132,7 @@ const page = () => {
               </h3>
               <button
                 onClick={handleCopy}
-                className="absolute top-2 right-2 p-2 m-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/80 transition"
+                className="absolute right-2 top-2 m-2 rounded-lg bg-primary p-2 text-primary-foreground hover:bg-primary/80 transition"
                 title={copied ? "Copied!" : "Copy to clipboard"}
                 aria-label="Copy to clipboard"
                 type="button"
@@ -155,4 +155,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default RetrieveTextPage;

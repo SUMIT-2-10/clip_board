@@ -115,10 +115,10 @@ export default function Home() {
   };
 
   return (
-    <main className="flex  flex-col w-full h-full items-center justify-center gap-6 p-6">
+    <main className="flex min-h-full w-full flex-col items-center justify-start gap-5 p-4 py-8 sm:justify-center sm:gap-6 sm:p-6">
       <h1 className="text-2xl font-bold">File Upload</h1>
 
-      <div className="mx-auto border rounded-3xl border-border bg-card text-card-foreground w-full max-w-2xl p-4 max-h-[80vh] shadow-sm flex flex-col">
+      <div className="mx-auto flex w-full max-w-2xl flex-col rounded-3xl border border-border bg-card p-3 text-card-foreground shadow-sm sm:p-4">
         <div
           onClick={() => fileInputRef.current?.click()}
           onDragOver={(e) => {
@@ -127,13 +127,13 @@ export default function Home() {
           }}
           onDragLeave={() => setIsDragActive(false)}
           onDrop={handleDrop}
-          className={`border-2 border-dashed rounded-xl p-8 min-h-55 flex flex-col items-center justify-center text-center cursor-pointer transition ${
+          className={`flex min-h-55 flex-col items-center justify-center rounded-xl border-2 border-dashed p-4 text-center cursor-pointer transition sm:p-8 ${
             isDragActive
               ? "border-primary bg-accent"
               : "border-border hover:bg-accent"
           }`}
         >
-          <p className="text-lg font-medium">
+          <p className="text-base font-medium sm:text-lg">
             Drag and drop a file here or click to upload
           </p>
           <p className="text-sm text-muted-foreground">Select a file to upload up to 50MB</p>
@@ -149,8 +149,8 @@ export default function Home() {
         {file && (
           <div className="mt-4 space-y-3">
             <div className="flex items-center justify-between border border-border bg-background p-3 rounded-lg">
-              <div className="w-full pr-4">
-                <p className="text-sm font-medium">{file.name}</p>
+              <div className="min-w-0 w-full pr-3">
+                <p className="break-all text-sm font-medium">{file.name}</p>
                 <p className="text-xs text-muted-foreground">
                   {formatFileSize(file.size)}
                 </p>
@@ -193,8 +193,8 @@ export default function Home() {
         )}
 
         {code && (
-          <div className="flex p-2 justify-center items-center gap-2">
-            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+          <div className="flex flex-wrap p-2 justify-center items-center gap-2 text-center">
+            <p className="break-all text-sm font-medium text-muted-foreground uppercase tracking-wider">
               Code to Retreive {code}
             </p>
             <button

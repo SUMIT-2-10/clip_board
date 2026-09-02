@@ -45,8 +45,8 @@ export default function Home() {
   ];
 
   return (
-    <div className="flex flex-col m-4 items-center justify-center bg-background text-foreground font-sans">
-      <div className="flex p-1 mb-4 bg-muted/50 rounded-2xl w-fit mx-auto sm:mx-0 backdrop-blur-sm border border-border">
+    <nav className="w-full px-3 pt-3 sm:px-6 sm:pt-6 bg-background text-foreground font-sans">
+      <div className="mx-auto grid w-full max-w-5xl grid-cols-2 gap-1 rounded-2xl border border-border bg-muted/50 p-1 backdrop-blur-sm sm:flex sm:w-fit sm:gap-0">
         {navLinks.map((link, idx) => {
           const isActive = pathname === link.match;
           return (
@@ -54,7 +54,7 @@ export default function Home() {
               key={link.label + idx}
               href={link.href}
               className={
-                `flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 ` +
+                `flex min-w-0 items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 text-center text-xs font-medium transition-all duration-300 sm:gap-2 sm:px-6 sm:text-sm ` +
                 (isActive
                   ? "bg-primary text-primary-foreground shadow-md"
                   : "text-muted-foreground hover:bg-primary hover:text-primary-foreground")
@@ -66,6 +66,6 @@ export default function Home() {
           );
         })}
       </div>
-    </div>
+    </nav>
   );
 }

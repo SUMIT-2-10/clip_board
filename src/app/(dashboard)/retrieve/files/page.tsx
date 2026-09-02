@@ -90,10 +90,10 @@ export default function Home() {
   const fileName = fileUrl ? decodeURIComponent(fileUrl.split("/").pop() || "downloaded-file") : "downloaded-file";
 
   return (
-    <main className="flex h-full  flex-col items-center justify-center gap-6 p-6">
+    <main className="flex min-h-full flex-col items-center justify-start gap-5 p-4 py-8 sm:justify-center sm:gap-6 sm:p-6">
       <h1 className="text-2xl font-bold">Retrieve File</h1>
 
-      <div className="w-full max-w-xl bg-card text-card-foreground rounded-3xl p-6 sm:p-8 shadow-sm border border-border overflow-hidden relative">
+      <div className="w-full max-w-xl bg-card text-card-foreground rounded-3xl p-4 sm:p-8 shadow-sm border border-border overflow-hidden relative">
         <div className="relative z-10 flex flex-col">
           <form
             onSubmit={handleRetrieve}
@@ -115,15 +115,15 @@ export default function Home() {
               </InputOTP>
             </div>
 
-            <p className="mt-4 text-center text-sm text-muted-foreground">
-              Enter your 6-digit code to fetch the shared file
+              <p className="mt-4 text-center text-sm text-muted-foreground">
+              Enter your 6-character code to fetch the shared file
             </p>
 
             <div className="flex justify-center mt-4 pt-4 border-t border-border">
               <button
                 type="submit"
                 disabled={!otp || otp.length !== 6 || isRetrieving}
-                className="flex items-center gap-2 px-8 py-3 bg-primary text-primary-foreground rounded-xl font-medium shadow-sm hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex w-full items-center justify-center gap-2 px-8 py-3 bg-primary text-primary-foreground rounded-xl font-medium shadow-sm hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto"
               >
                 {isRetrieving ? "Retrieving..." : "Retrieve"}
                 {!isRetrieving && (
@@ -154,7 +154,7 @@ export default function Home() {
       )}
 
       {fileUrl && (
-        <div className="w-full max-w-xl bg-card text-card-foreground rounded-3xl p-6 shadow-sm border border-border animate-in fade-in slide-in-from-bottom-2 duration-500">
+        <div className="w-full max-w-xl bg-card text-card-foreground rounded-3xl p-4 shadow-sm border border-border animate-in fade-in slide-in-from-bottom-2 duration-500 sm:p-6">
           <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
             File Ready
           </h2>

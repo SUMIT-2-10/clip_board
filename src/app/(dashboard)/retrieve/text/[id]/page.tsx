@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { CopyIcon } from "lucide-react";
 
-const page = () => {
+const RetrieveTextByIdPage = () => {
     const { id } = useParams();
     const [text, setText] = useState("");
     const [isRetreiving, setIsRetreiving] = useState(false);
@@ -57,10 +57,10 @@ const page = () => {
     }, []);
 
     return (
-        <div className="h-full bg-background text-foreground font-sans selection:bg-primary/20">
+        <div className="min-h-full bg-background text-foreground font-sans selection:bg-primary/20">
 
             {/* Main Dashboard */}
-            <main className="flex flex-col justify-center items-center h-full p-4">
+            <main className="flex min-h-full flex-col justify-start items-center p-4 py-8 sm:justify-center">
 
                 {isRetreiving && (
                     <p className="text-sm text-muted-foreground">Retrieving text...</p>
@@ -73,7 +73,7 @@ const page = () => {
                 )}
 
                 {text && (
-                    <div className="w-full max-w-xl bg-card text-card-foreground rounded-3xl p-6 sm:p-8 shadow-sm border border-border overflow-hidden relative mt-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                    <div className="w-full max-w-xl bg-card text-card-foreground rounded-3xl p-4 sm:p-8 shadow-sm border border-border overflow-hidden relative mt-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
                         <div className="flex flex-col gap-4">
                             <div className="flex flex-row justify-between gap-4">
                                 <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Retrieved Content</h3>
@@ -101,4 +101,4 @@ const page = () => {
     )
 }
 
-export default page
+export default RetrieveTextByIdPage

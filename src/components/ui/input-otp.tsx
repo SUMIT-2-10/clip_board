@@ -1,7 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { OTPInput, OTPInputContext } from "input-otp"
+import {
+  OTPInput,
+  OTPInputContext,
+  REGEXP_ONLY_DIGITS_AND_CHARS,
+} from "input-otp"
 
 import { cn } from "@/lib/utils"
 import { MinusIcon } from "lucide-react"
@@ -21,6 +25,8 @@ function InputOTP({
         containerClassName
       )}
       spellCheck={false}
+      inputMode="text"
+      pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
       className={cn("disabled:cursor-not-allowed", className)}
       {...props}
     />
