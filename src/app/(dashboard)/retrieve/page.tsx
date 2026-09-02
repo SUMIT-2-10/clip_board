@@ -99,7 +99,6 @@ const RetrieveTextPage = () => {
     <div className="min-h-full w-full bg-background text-foreground font-sans selection:bg-primary/20">
       {/* Main Dashboard */}
       <main className="flex min-h-full flex-col justify-start items-center gap-5 p-4 py-8 sm:justify-center sm:gap-6 sm:p-6">
-        <h1 className="text-2xl font-bold">Retrieve Text</h1>
         {/* Primary Action Card */}
         <div className="w-full max-w-xl bg-card text-card-foreground rounded-3xl p-4 sm:p-8 shadow-sm border border-border overflow-hidden relative">
           {/* Dynamic Content Area */}

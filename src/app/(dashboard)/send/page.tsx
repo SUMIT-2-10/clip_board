@@ -108,7 +108,6 @@ export default function ShareDashboard() {
     <div className="min-h-full w-full bg-background text-foreground font-sans selection:bg-primary/20">
       {/* Main Dashboard */}
       <main className="flex min-h-full w-full flex-col items-center justify-start gap-5 p-4 py-8 sm:justify-center sm:gap-6 sm:p-6">
-        <h1 className="text-2xl font-bold">Text Upload</h1>
         {/* Primary Action Card (Spans 8 cols on tablet/desktop) */}
         <div className="w-full max-w-3xl bg-card text-card-foreground rounded-3xl p-4 sm:p-8 shadow-sm border border-border overflow-hidden relative">
           {/* Dynamic Content Area */}
