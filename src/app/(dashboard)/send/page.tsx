@@ -124,28 +124,30 @@ export default function ShareDashboard() {
                   className="w-full h-full min-h-50 resize-none bg-transparent text-lg text-foreground placeholder:text-muted-foreground focus:outline-none p-2 leading-relaxed"
                 />
 
-                {/* Character Count */}
-                <div className="absolute bottom-4 right-2 text-xs font-medium text-muted-foreground transition-opacity flex gap-4  p-2 rounded-xl ">
-                  <span>{text.length} chars</span>
-                  <span>
-                    {text.split(/\s+/).filter((word) => word.length > 0).length}{" "}
-                    words
-                  </span>
+                <div className="mt-3 flex flex-col gap-2 border-t border-border pt-3 sm:flex-row sm:items-center sm:justify-between">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex min-w-0 w-full items-center rounded-xl border border-dashed border-border bg-muted/10 px-4 py-3 text-left text-sm text-muted-foreground transition hover:bg-accent sm:w-auto sm:max-w-[70%]"
+                  >
+                    <FileIcon className="mr-2 h-4 w-4 shrink-0" />
+                    <span className="min-w-0 truncate">
+                      {file ? `Attached: ${file.name}` : "Attach a file (optional)"}
+                    </span>
+                  </button>
+                  <div className="flex justify-end gap-4 px-1 text-xs font-medium text-muted-foreground sm:shrink-0">
+                    <span>{text.length} chars</span>
+                    <span>
+                      {text.split(/\s+/).filter((word) => word.length > 0).length} words
+                    </span>
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+                  />
                 </div>
-
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="mt-3 w-full rounded-xl border border-dashed border-border px-4 py-3 text-left text-sm text-muted-foreground hover:bg-accent sm:w-auto bg-muted/10"
-                ><FileIcon className="w-4 h-4 mr-2 inline-block" />
-                  {file ? `Attached: ${file.name}` : "Attach a file (optional)"}
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  className="hidden"
-                  onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-                />
               </div>
 
               <div className="flex flex-col-reverse gap-3 mt-4 pt-4 pb-4 border-t border-border sm:flex-row sm:justify-end sm:gap-4">
