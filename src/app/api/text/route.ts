@@ -7,11 +7,11 @@ export async function POST(req: Request) {
     await connectDB();
 
     try {
-        const { content, link } = await req.json();
+        const { content, link, fileUrl, fileName } = await req.json();
         const normalizedLink = String(link).trim();
 
-        if (!content || !normalizedLink) {
-            return new Response(JSON.stringify({ error: 'Content and link are required' }), { status: 400 });
+        if ((!content && !fileUrl) || !normalizedLink) {
+            return new Response(JSON.stringify({ error: 'Text or file and link are required' }), { status: 400 });
         }
 
         // Save alphanumeric code/link and expire it after 10 minutes (testing)
@@ -22,6 +22,8 @@ export async function POST(req: Request) {
             link: normalizedLink,
             expiresAt: expiresAtIso,
             code: normalizedLink,
+            fileUrl: fileUrl || undefined,
+            fileName: fileName || undefined,
         });
         await newText.save();
         return new Response(JSON.stringify({ link: normalizedLink }), { status: 201 });
@@ -49,7 +51,13 @@ export async function GET(req: Request) {
         if (isExpired(textData.expiresAt)) {
             return new Response(JSON.stringify({ error: 'This link has expired' }), { status: 410 });
         }
-        return new Response(JSON.stringify({ content: textData.content, link: textData.link, code: textData.code }), { status: 200 });
+        return new Response(JSON.stringify({
+            content: textData.content,
+            link: textData.link,
+            code: textData.code,
+            fileUrl: textData.fileUrl || null,
+            fileName: textData.fileName || null,
+        }), { status: 200 });
     } catch (error) {
         console.error('Error retrieving text by code:', error);
         const message = error instanceof Error ? error.message : 'Failed to retrieve text';

@@ -19,28 +19,16 @@ export default function Home() {
   const pathname = usePathname();
   const navLinks = [
     {
-      href: "/sharetext",
-      label: "Send Text",
+      href: "/send",
+      label: "Send",
       icon: <TextIcon />,
-      match: "/sharetext",
+      match: "/send",
     },
     {
-      href: "/retrieve/text",
-      label: "Retrieve Text",
-      icon: <TextIcon />,
-      match: "/retrieve/text",
-    },
-    {
-      href: "/sharefile",
-      label: "Send Files",
+      href: "/retrieve",
+      label: "Retrieve",
       icon: <FileIcon />,
-      match: "/sharefile",
-    },
-    {
-      href: "/retrieve/files",
-      label: "Retrieve Files",
-      icon: <FileIcon />,
-      match: "/retrieve/files",
+      match: "/retrieve",
     },
   ];
 

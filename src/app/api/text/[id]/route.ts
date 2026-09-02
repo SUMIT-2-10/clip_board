@@ -27,7 +27,13 @@ export async function GET(req: Request) {
         if (isExpired(textData.expiresAt)) {
             return new Response(JSON.stringify({ error: 'This link has expired' }), { status: 410 });
         }
-        return new Response(JSON.stringify({ content: textData.content, link: textData.link, code: textData.code }), { status: 200 });
+        return new Response(JSON.stringify({
+            content: textData.content,
+            link: textData.link,
+            code: textData.code,
+            fileUrl: textData.fileUrl || null,
+            fileName: textData.fileName || null,
+        }), { status: 200 });
     } catch (error) {
         console.error('Error retrieving text:', error);
         return new Response(JSON.stringify({ error: 'Failed to retrieve text' }), { status: 500 });

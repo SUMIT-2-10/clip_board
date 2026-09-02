@@ -4,7 +4,7 @@ import * as React from "react"
 import {
   OTPInput,
   OTPInputContext,
-  REGEXP_ONLY_DIGITS_AND_CHARS,
+  REGEXP_ONLY_DIGITS,
 } from "input-otp"
 
 import { cn } from "@/lib/utils"
@@ -25,8 +25,8 @@ function InputOTP({
         containerClassName
       )}
       spellCheck={false}
-      inputMode="text"
-      pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+      inputMode="numeric"
+      pattern={REGEXP_ONLY_DIGITS}
       className={cn("disabled:cursor-not-allowed", className)}
       {...props}
     />

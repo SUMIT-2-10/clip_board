@@ -3,7 +3,8 @@ import mongoose, {Schema } from 'mongoose';
 const textSchema = new Schema({
     content: { 
         type: String, 
-        required: true 
+        required: false,
+        default: ""
     },
 
     link: {
@@ -21,6 +22,14 @@ const textSchema = new Schema({
         type: String,
         required: true,
         unique: true
+    },
+    fileUrl: {
+        type: String,
+        required: false
+    },
+    fileName: {
+        type: String,
+        required: false
     }
 
 }, {
